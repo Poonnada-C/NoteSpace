@@ -10,12 +10,14 @@ from django.template.loader import get_template
 def ClearStrSpace(input):  #delete excess space
     return " ".join(input.split())
 
-def home_page(request):
+def home_page(request):   # <domain>/
     notes = Note.objects.order_by('-upload_time')  #get notes from db and order them by upload time
     return render(request,'home_page.html',{'notes':notes})  #return from home_page.html with notes
-def upload_page(request):
+
+def upload_page(request):   # <domain>/upload/
     return render(request,'upload_page.html')  #return from upload_page.html
-def upload_api(request):
+
+def upload_api(request):   # <domain>/api/upload/
     filetype_list = ["img", "png", "jpg" ,"jpeg", "tiff", "gif", "bmp"]
     if request.POST:
         newnote = Note()
@@ -42,16 +44,16 @@ def upload_api(request):
         return HttpResponseRedirect('/')   #return to homepage
     return HttpResponseRedirect('/')   #return to homepage
 
-def detial(request,note_index):
-    n = get_object_or_404(Note, pk=note_index)
-    images = Image.objects.filter(note=n)
-    img_url = [i.image.url for i in images]
+def detial(request,note_index):  # <domain>/<note_index>/
+    n = get_object_or_404(Note, pk=note_index)   #get note from database (if not found return 404)
+    images = Image.objects.filter(note=n)    #get images of the note from database
+    img_url = [i.image.url for i in images]   #get list of urls of those images
     return render(request,'detail.html',{'images_url':img_url,'note':n})  #return from detail.html with image_urls and notes
 
-def about(request):
+def about(request):   # <domain>/about/
     return render(request, 'about.html')  #return from about_page.html
 
-def help(request):
+def help(request):   # <domain>/help/
     return render(request, 'help_main.html')  #return from help_main.html
 
 def help_detail(request, help_topic):
@@ -61,7 +63,7 @@ def help_detail(request, help_topic):
     except:
         return HttpResponseNotFound("<h1>404 Page not found</h1>")
 
-def search(request):
+def search(request):   # <domain>/search?q=<query_word>/
     query_word = request.GET.get("q",'')
     searched_notes = Note.objects.filter(Q(name__icontains=query_word) | 
                                             Q(desc__icontains=query_word) |
@@ -73,11 +75,11 @@ def search(request):
         'search_key':query_word,
         'searched_notes':searched_notes })
 
-def tagQuery(request, tag_title):
+def tagQuery(request, tag_title):   # <domain>/tag/<tag_name>
     query_tag = get_object_or_404(Tag , title=tag_title)
     return render(request, 'tag_result.html',{'tag':query_tag})
 
-def addcomment_api(request):
+def addcomment_api(request):   # <domain>/api/addcomment/
     note_id = request.POST['note_id']
     n = Note.objects.get(id=note_id)
 
