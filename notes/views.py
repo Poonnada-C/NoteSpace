@@ -12,10 +12,10 @@ def ClearStrSpace(input):  #delete excess space
 
 def home_page(request):   # <domain>/
     notes = Note.objects.order_by('-upload_time')  #get notes from db and order them by upload time
-    return render(request,'home_page.html',{'notes':notes})  #return from home_page.html with notes
+    return render(request,'home_page.html',{'notes':notes})  #return home_page.html with notes
 
 def upload_page(request):   # <domain>/upload/
-    return render(request,'upload_page.html')  #return from upload_page.html
+    return render(request,'upload_page.html')  #return upload_page.html
 
 def upload_api(request):   # <domain>/api/upload/
     filetype_list = ["img", "png", "jpg" ,"jpeg", "tiff", "gif", "bmp"]
@@ -48,13 +48,13 @@ def detial(request,note_index):  # <domain>/<note_index>/
     n = get_object_or_404(Note, pk=note_index)   #get note from database (if not found return 404)
     images = Image.objects.filter(note=n)    #get images of the note from database
     img_url = [i.image.url for i in images]   #get list of urls of those images
-    return render(request,'detail.html',{'images_url':img_url,'note':n})  #return from detail.html with image_urls and notes
+    return render(request,'detail.html',{'images_url':img_url,'note':n})  #return detail.html with image_urls and notes
 
 def about(request):   # <domain>/about/
-    return render(request, 'about.html')  #return from about_page.html
+    return render(request, 'about.html')  #return about_page.html
 
 def help(request):   # <domain>/help/
-    return render(request, 'help_main.html')  #return from help_main.html
+    return render(request, 'help_main.html')  #return help_main.html
 
 def help_detail(request, help_topic):
     try:
@@ -64,34 +64,36 @@ def help_detail(request, help_topic):
         return HttpResponseNotFound("<h1>404 Page not found</h1>")
 
 def search(request):   # <domain>/search?q=<query_word>/
-    query_word = request.GET.get("q",'')
-    searched_notes = Note.objects.filter(Q(name__icontains=query_word) | 
+    query_word = request.GET.get("q",'')  #set query_word value from request parameter 'q'
+    searched_notes = Note.objects.filter(Q(name__icontains=query_word) |   #get notes from database ,filter by using query with name or description or tag
                                             Q(desc__icontains=query_word) |
                                             Q(tags__title__icontains=query_word) 
                                             ) 
    
-    return render(request, 'search_result.html', 
+    return render(request, 'search_result.html',   #return search_result.html with search_key and searched_noted
     {
         'search_key':query_word,
         'searched_notes':searched_notes })
 
 def tagQuery(request, tag_title):   # <domain>/tag/<tag_name>
-    query_tag = get_object_or_404(Tag , title=tag_title)
-    return render(request, 'tag_result.html',{'tag':query_tag})
+    query_tag = get_object_or_404(Tag , title=tag_title)  # get tag from database (if not found return 404)
+    return render(request, 'tag_result.html',{'tag':query_tag})  #return tag_result.html  
 
 def addcomment_api(request):   # <domain>/api/addcomment/
-    note_id = request.POST['note_id']
-    n = Note.objects.get(id=note_id)
+    note_id = request.POST['note_id']   #set note_id value
+    n = Note.objects.get(id=note_id)   #save note_id to n
 
-    author = request.POST['author']
-    text = request.POST['text']
-    score = float(request.POST['score']) if request.POST['score'] in ["1","2","3","4","5"] else 0
+    author = request.POST['author']   # set author value from  POST method request parameter 'note_id'
+    text = request.POST['text']   # set text value from POST method request parameter 'text'
+    score = float(request.POST['score']) if request.POST['score'] in ["1","2","3","4","5"] else 0   #set score value (if score is number 0-5 else 0)
 
-    review = Review()
-    review.note = n
-    review.author = author
-    review.text = text
-    review.score = score
 
-    review.save()
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    review = Review()   #create review
+    review.note = n   #set note of review
+    review.author = author   #set author review
+    review.text = text   #set text review
+    review.score = score   #set score review
+
+    review.save()   #save review to database
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))   #return to current page 
