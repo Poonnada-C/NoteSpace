@@ -75,11 +75,11 @@ def search(request):   # <domain>/search?q=<query_word>/
         'search_key':query_word,
         'searched_notes':searched_notes })
 
-def tagQuery(request, tag_title):   # <domain>/tag/<tag_name>
+def tag_query(request, tag_title):   # <domain>/tag/<tag_name>
     query_tag = get_object_or_404(Tag , title=tag_title)  # get tag from database (if not found return 404)
     return render(request, 'tag_result.html',{'tag':query_tag})  #return tag_result.html  
 
-def addcomment_api(request):   # <domain>/api/addcomment/
+def add_comment_api(request):   # <domain>/api/addcomment/
     note_id = request.POST['note_id']   #set note_id value
     n = Note.objects.get(id=note_id)   #save note_id to n
 
