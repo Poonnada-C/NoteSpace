@@ -7,7 +7,7 @@ from django.http import HttpResponseNotFound
 from .models import Note, Image, Tag, Review
 from django.template.loader import get_template
 # Create your views here.
-def ClearStrSpace(input):  #delete excess space
+def _clear_str_space(input):  #delete excess space
     return " ".join(input.split())
 
 def home_page(request):   # <domain>/
@@ -18,19 +18,19 @@ def upload_page(request):   # <domain>/upload/
     return render(request,'upload_page.html')  #return upload_page.html
 
 def upload_api(request):   # <domain>/api/upload/
-    filetype_list = ["img", "png", "jpg" ,"jpeg", "tiff", "gif", "bmp"]
+    img_filetype = ["img", "png", "jpg" ,"jpeg", "tiff", "gif", "bmp"]
     if request.POST:
         newnote = Note()
-        newnote.name  =  ClearStrSpace(request.POST['name'])  #delete excess space and set note name
-        newnote.owner =  ClearStrSpace(request.POST['guestname'])  #delete excess space and set owner name
-        newnote.desc  =  ClearStrSpace(request.POST['desc'])  #delete excess space and set description
+        newnote.name  =  _clear_str_space(request.POST['name'])  #delete excess space and set note name
+        newnote.owner =  _clear_str_space(request.POST['guestname'])  #delete excess space and set owner name
+        newnote.desc  =  _clear_str_space(request.POST['desc'])  #delete excess space and set description
         newnote.save()  #save note to database
 
         i = 0
         
         for file in request.FILES.getlist('myfile'):
             if(len(file.name.split(".")) > 1 and
-                    file.name.split(".")[-1].lower() in filetype_list):    #check file type (image type)
+                    file.name.split(".")[-1].lower() in img_filetype):   #check file type (image type)
                 newimg = Image()
                 newimg.image = file   #set image to current file
                 newimg.index = i   #set image index
@@ -45,10 +45,10 @@ def upload_api(request):   # <domain>/api/upload/
     return HttpResponseRedirect('/')   #return to homepage
 
 def detial(request,note_index):  # <domain>/<note_index>/
-    n = get_object_or_404(Note, pk=note_index)   #get note from database (if not found return 404)
-    images = Image.objects.filter(note=n)    #get images of the note from database
-    img_url = [i.image.url for i in images]   #get list of urls of those images
-    return render(request,'detail.html',{'images_url':img_url,'note':n})  #return detail.html with image_urls and notes
+    _n = get_object_or_404(Note, pk=note_index)   #get note from database (if not found return 404)
+    _images = Image.objects.filter(note=_n)    #get images of the note from database
+    img_url = [i.image.url for i in _images]   #get list of urls of those images
+    return render(request,'detail.html',{'images_url':img_url,'note':_n})  #return detail.html with image_urls and notes
 
 def about(request):   # <domain>/about/
     return render(request, 'about.html')  #return about_page.html
@@ -81,7 +81,7 @@ def tag_query(request, tag_title):   # <domain>/tag/<tag_name>
 
 def add_comment_api(request):   # <domain>/api/addcomment/
     note_id = request.POST['note_id']   #set note_id value
-    n = Note.objects.get(id=note_id)   #save note_id to n
+    _n = Note.objects.get(id=note_id)   #save note_id to n
 
     author = request.POST['author']   # set author value from  POST method request parameter 'note_id'
     text = request.POST['text']   # set text value from POST method request parameter 'text'
@@ -90,7 +90,7 @@ def add_comment_api(request):   # <domain>/api/addcomment/
 
 
     review = Review()   #create review
-    review.note = n   #set note of review
+    review.note = _n   #set note of review
     review.author = author   #set author review
     review.text = text   #set text review
     review.score = score   #set score review
