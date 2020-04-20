@@ -66,7 +66,7 @@ def help_detail(request, help_topic):
 def search(request):   # <domain>/search?q=<query_word>/
     query_word = request.GET.get("q", '')  # Set query_word value from request parameter 'q'
     searched_notes = Note.objects.filter(
-	Q(name__icontains=query_word) |   # Get notes from database ,filter by using query with name or description or tag
+	Q(name__icontains=query_word) |   # Get notes from database, filter by using query with name or description or tag
         Q(desc__icontains=query_word) |
         Q(tags__title__icontains=query_word) 
         ) 
