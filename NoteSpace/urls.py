@@ -23,6 +23,9 @@ from django.urls import include, path
 from notes import views
 
 urlpatterns = [
+    url(r'^stop-tracking/$', views.stop_tracking, name='stop_tracking'),
+    url(r'^track_user/$', views.track_user, name='track_user'),
+    url(r'^cookie/$', views.test_cookie, name='cookie'),
     url(r'^admin/', admin.site.urls),
     url(r'^$',views.home_page, name="home_page"),
     url(r'^upload/',views.upload_page, name='upload_page'),

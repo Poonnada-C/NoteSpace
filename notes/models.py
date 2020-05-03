@@ -16,12 +16,10 @@ class Tag(models.Model):
         verbose_name_plural = "tags"
         ordering = ['title']
     
-    
     def get_absolute_url(self):
-     return "/tags/%s/" % self.slug
+        return "/tags/%s/" % self.slug
     def __str__(self):
         return self.title
-
 
 class Note(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -50,6 +48,7 @@ class Image(models.Model):
     index = models.IntegerField()
     note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name="images")
     image = ImageField(upload_to=note_directory_path)
+
     def get_thumb(self):
         im = get_thumbnail(self.image, '500x500', crop='center', quality=99)
         return im.url # remember that sorl objects have url/width/height attributes
