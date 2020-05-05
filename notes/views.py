@@ -26,7 +26,7 @@ def upload_api(request):   # <domain>/api/upload/
     else:
         cookies = request.COOKIES.get('owner')
         response = HttpResponseRedirect('/')
-        response.set_cookie('owner', str(cookies) + ',' + str(newnote.name))    # Set Owner Cookies 
+        response.set_cookie('owner', str(cookies) + str(newnote.name))    # Set Owner Cookies 
     return response   # Return to homepage
     # Set Cookie
 
@@ -41,7 +41,7 @@ def upload_api(request):   # <domain>/api/upload/
         
         for file in request.FILES.getlist('myfile'):
             if(len(file.name.split(".")) > 1 and
-                    file.name.split(".")[-1].lower() in img_filetype):   # Check file type (image type)
+                   file.name.split(".")[-1].lower() in img_filetype):   # Check file type (image type)
                 newimg = Image()
                 newimg.image = file   # Set image to current file
                 newimg.index = i   # Set image index
@@ -58,7 +58,14 @@ def detial(request, note_index):  # <domain>/<note_index>/
     _n = get_object_or_404(Note, pk=note_index)   # Get note from database (if not found return 404)
     _images = Image.objects.filter(note=_n)    # Get images of the note from database
     img_url = [i.image.url for i in _images]   # Get list of urls of those images
-    return render(request, 'detail.html', {'images_url': img_url, 'note': _n})  # Return detail.html with image_urls and note
+    if request.COOKIES.get('owner'):   
+        cookies = request.COOKIES.get('owner')
+        owned = False   # Set owned to False value
+        if str(_n.name) in str(cookies):   # Check that notename is in cookies
+            owned = True   # Set owned to True value
+        else:
+            owned = False  # Set owned to False value
+    return render(request, 'detail.html', {'images_url': img_url, 'note': _n, 'owned': owned})  # Return detail.html with image_urls, note, owned
 
 def test_cookie(request):   
     if not request.COOKIES.get('color'):
@@ -86,6 +93,7 @@ def stop_tracking(request):
     else:
         response = HttpResponse("We are not tracking you.")
     return response
+
 def about(request):   # <domain>/about/
     return render(request, 'about.html')  # Return about_page.html
 
@@ -123,8 +131,6 @@ def add_comment_api(request):   # <domain>/api/addcomment/
     author = request.POST['author']   # Set author value from  POST method request parameter 'note_id'
     text = request.POST['text']   # Set text value from POST method request parameter 'text'
     score = float(request.POST['score']) if request.POST['score'] in ["1", "2", "3", "4", "5"] else 0   # Set score value (if score is number 0-5 else 0)
-
-
 
     review = Review()   # Create review
     review.note = _n   # Set note of review
