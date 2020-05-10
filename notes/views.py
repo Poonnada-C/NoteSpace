@@ -11,31 +11,31 @@ def _clear_str_space(input):  # Delete excess space
     return " ".join(input.split())
 
 def home_page(request):   # <domain>/
-    notes = Note.objects.order_by('-upload_time')  # Get notes from db and order them by upload time
-    return render(request, 'home_page.html', {'notes': notes})  # Return home_page.html with notes
+    notes = Note.objects.order_by('-upload_time')   # Get notes from db and order them by upload time
+    return render(request, 'home_page.html', {'notes': notes})   # Return home_page.html with notes
 
 def upload_page(request):   # <domain>/upload/
-    return render(request, 'upload_page.html')  # Return upload_page.html
+    return render(request, 'upload_page.html')   # Return upload_page.html
 
 def upload_api(request):   # <domain>/api/upload/
     img_filetype = ["img", "png", "jpg" ,"jpeg", "tiff", "gif", "bmp"]
     if not request.COOKIES.get('owner'):
         response = HttpResponseRedirect('/')
-        response.set_cookie('owner', str(newnote.name))    # Set Owner Cookies to notename
+        response.set_cookie('owner', str(newnote.name))   # Set Owner Cookies to notename
         return response   # Return to homepage
     else:
         cookies = request.COOKIES.get('owner')
         response = HttpResponseRedirect('/')
-        response.set_cookie('owner', str(cookies) + str(newnote.name))    # Set Owner Cookies 
+        response.set_cookie('owner', str(cookies) + str(newnote.name))   # Set Owner Cookies 
     return response   # Return to homepage
     # Set Cookie
 
     if request.POST:
         newnote = Note()
-        newnote.name  =  _clear_str_space(request.POST['name'])  # Delete excess space and set note name
-        newnote.owner =  _clear_str_space(request.POST['guestname'])  # Delete excess space and set owner name
-        newnote.desc  =  _clear_str_space(request.POST['desc'])  # Delete excess space and set description
-        newnote.save()  # Save note to database
+        newnote.name  =  _clear_str_space(request.POST['name'])   # Delete excess space and set note name
+        newnote.owner =  _clear_str_space(request.POST['guestname'])   # Delete excess space and set owner name
+        newnote.desc  =  _clear_str_space(request.POST['desc'])   # Delete excess space and set description
+        newnote.save()   # Save note to database
 
         i = 0
         
@@ -48,24 +48,30 @@ def upload_api(request):   # <domain>/api/upload/
                 newimg.note = newnote   # Set note to newnote
                 newimg.save()   # Save image to database
                 i += 1
-        if(i==0): # All file is invalid
+        if(i==0):  # All file is invalid
             newnote.delete()    # Delete note
             return HttpResponse("File Type Error")  # Return file type error
         return HttpResponseRedirect('/')   # Return to homepage
+    return HttpResponseRedirect('/')   # Return to homepage
+
+def delete(request, note_index):
+    _n = get_object_or_404(Note, pk=note_index)   # Get note from database (if not found return 404) 
+    if request.method == 'POST':
+        _n.delete()   # Delete the note
     return HttpResponseRedirect('/')   # Return to homepage
 
 def detial(request, note_index):  # <domain>/<note_index>/
     _n = get_object_or_404(Note, pk=note_index)   # Get note from database (if not found return 404)
     _images = Image.objects.filter(note=_n)    # Get images of the note from database
     img_url = [i.image.url for i in _images]   # Get list of urls of those images
+    owned = False   # Set owned to False value
     if request.COOKIES.get('owner'):   
         cookies = request.COOKIES.get('owner')
-        owned = False   # Set owned to False value
         if str(_n.name) in str(cookies):   # Check that notename is in cookies
             owned = True   # Set owned to True value
         else:
             owned = False  # Set owned to False value
-    return render(request, 'detail.html', {'images_url': img_url, 'note': _n, 'owned': owned})  # Return detail.html with image_urls, note, owned
+    return render(request, 'detail.html', {'images_url': img_url, 'note': _n, 'owned': owned})   # Return detail.html with image_urls, note, owned
 
 def test_cookie(request):   
     if not request.COOKIES.get('color'):

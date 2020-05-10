@@ -3,5 +3,6 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 urlpatterns = [
-    path("<int:note_index>/", views.detial,name="detail")
+    path("<int:note_index>/", views.detial,name="detail"),
+    path('delete/<int:note_id>/', views.delete, name='delete'),
 ]
