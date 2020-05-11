@@ -108,12 +108,12 @@
     {% endfor %}
   </span>
   <form action="{% url 'delete' note.id %}" method="POST" >
-     {% csrf_token %}
-     {% if owned %}
-       <button type="submit" class="btn btn-danger mb-2" id="btnDelete">Delete</button>
-     {% else %}
+    {% csrf_token %}
+    {% if owned %}
+      <button type="submit" class="btn btn-danger mb-2" id="btnDelete">Delete</button>
+    {% else %}
     
-     {% endif %}
+    {% endif %}
   <div class="slideshow-container">
 
     {% for i in images_url %}

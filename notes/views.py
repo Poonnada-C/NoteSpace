@@ -19,16 +19,6 @@ def upload_page(request):   # <domain>/upload/
 
 def upload_api(request):   # <domain>/api/upload/
     img_filetype = ["img", "png", "jpg" ,"jpeg", "tiff", "gif", "bmp"]
-    if not request.COOKIES.get('owner'):
-        response = HttpResponseRedirect('/')
-        response.set_cookie('owner', str(newnote.name))   # Set Owner Cookies to notename
-        return response   # Return to homepage
-    else:
-        cookies = request.COOKIES.get('owner')
-        response = HttpResponseRedirect('/')
-        response.set_cookie('owner', str(cookies) + str(newnote.name))   # Set Owner Cookies 
-    return response   # Return to homepage
-    # Set Cookie
 
     if request.POST:
         newnote = Note()
@@ -51,6 +41,16 @@ def upload_api(request):   # <domain>/api/upload/
         if(i==0):  # All file is invalid
             newnote.delete()    # Delete note
             return HttpResponse("File Type Error")  # Return file type error
+        if not request.COOKIES.get('owner'):
+            response = HttpResponseRedirect('/')
+            response.set_cookie('owner', str(newnote.id))   # Set Owner Cookies to noteID
+            return response   # Return to homepage
+        else:
+            cookies = request.COOKIES.get('owner')
+            response = HttpResponseRedirect('/')
+            response.set_cookie('owner', str(cookies) + ',' + str(newnote.id))   # Set Owner Cookies 
+        return response   # Return to homepage
+        # Set Cookie
         return HttpResponseRedirect('/')   # Return to homepage
     return HttpResponseRedirect('/')   # Return to homepage
 
@@ -67,7 +67,7 @@ def detial(request, note_index):  # <domain>/<note_index>/
     owned = False   # Set owned to False value
     if request.COOKIES.get('owner'):   
         cookies = request.COOKIES.get('owner')
-        if str(_n.name) in str(cookies):   # Check that notename is in cookies
+        if str(_n.id) in str(cookies):   # Check that notename is in cookies
             owned = True   # Set owned to True value
         else:
             owned = False  # Set owned to False value
